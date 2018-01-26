@@ -6,11 +6,11 @@
 
 import numpy as np
 import csv
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--iteration', action='store', dest='nstep', type=int, default=1)
+parser.add_argument('--iterations', action='store', dest='nstep', type=int, default=1)
 parser.add_argument('--nodev', action='store_true', dest='noDev', default=False)
 argu = parser.parse_args()
 
@@ -21,7 +21,7 @@ noDev = argu.noDev
 def readData(dataset):
     y = []
     x = []
-    path = ['./adult/a7a' , dataset]
+    path = ['/u/cs246/data/adult/a7a' , dataset]
     filepath = '.'.join(path)
     with open(filepath) as f:
         trainData = csv.reader(f, delimiter=' ')
@@ -32,7 +32,11 @@ def readData(dataset):
             temp[-1] = 1
             for element in row[1:]:
                 if len(element) != 0:
-                    markLoc = int(element.split(':')[0]) - 1
+  		    #things are confusing here
+                    #the feature index can be start from 1 or 0.
+                    #if considering 1 to 123, I should use markLoc = int(element.split(':')[0]) - 1
+                    #to be consistent with the example, I consider it 0 to 122: 
+                    markLoc = int(element.split(':')[0])
                     temp[markLoc] = 1
             
             x.append(temp)
@@ -80,9 +84,9 @@ if noDev == False:
             if t*yDev[index] > 0:
                 right += 1
         acc.append(right/float(len(xDev)))
-
-    plt.plot(acc)
-    plt.show()
+    print('dev accuracy vs. iteration:', acc)
+   # plt.plot(acc)
+   # plt.show()
     
     
     
