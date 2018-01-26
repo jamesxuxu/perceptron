@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 ######################
 ## HW2 by Xin Bian  ##
 ######################
@@ -5,12 +7,20 @@
 import numpy as np
 import csv
 import matplotlib.pyplot as plt
+import argparse
 
-y = []
-x = []
+parser = argparse.ArgumentParser()
+parser.add_argument('--iteration', action='store', dest='nstep', type=int, default=1)
+parser.add_argument('--nodev', action='store_true', dest='noDev', default=False)
+argu = parser.parse_args()
 
+nstep = argu.nstep
+noDev = argu.noDev
 
+#define read data function
 def readData(dataset):
+    y = []
+    x = []
     path = ['./adult/a7a' , dataset]
     filepath = '.'.join(path)
     with open(filepath) as f:
@@ -26,37 +36,53 @@ def readData(dataset):
                     temp[markLoc] = 1
             
             x.append(temp)
+    return x, y
     
-    
-readData('train')
+#read data
+xTrain, yTrain = readData('train')
+xTest, yTest = readData('test')
 
-#train model, update w
-def model(alpha):
+#function used to train model
+def model(nstep):
     w = np.zeros((124,1))
-    for index, xn in enumerate(x):
-        t = np.sign(np.dot(np.transpose(w), xn))        
-        if t!= y[index]:
-            w = w + alpha*y[index]*xn 
+    for _ in range(nstep):
+        for index, xn in enumerate(xTrain):
+            t = np.sign(np.dot(np.transpose(w), xn))        
+            if t!= yTrain[index]:
+                w = w + yTrain[index]*xn 
     return w
+    
 
-
-
-readData('train')
+    
+##test result on test dataset
 right = 0
+w = model(nstep)
+for index, xn in enumerate(xTest):
+    t = np.sign(np.dot(np.transpose(w), xn))
+    if t*yTest[index] > 0:
+        right += 1
+accuracy = right/float(len(xTest))
+
+    
+print('Test accuracy:', accuracy)
+print('Feature weights (bias last):', ' '.join(map(str, np.transpose(w)[0])))
+    
+
+##dev to adjust hyperparameter
 acc = []
+if noDev == False:
+    xDev, yDev = readData('dev')
+    for i in range(nstep):
+        right = 0
+        wDev = model(i+1)
+        for index, xn in enumerate(xDev):
+            t = np.sign(np.dot(np.transpose(wDev), xn))
+            if t*yDev[index] > 0:
+                right += 1
+        acc.append(right/float(len(xDev)))
 
-#change learning rate, plot accuracy
-for alpha in range(1,101,2):
-    alpha = alpha/float(100)
-    w = model(alpha)
-    for index, xn in enumerate(x):
-        t = np.sign(np.dot(np.transpose(w), xn))
-        if t*y[index] > 0:
-            right += 1
-    acc.append(right/float(len(x)))
-    right = 0
-
-plt.plot(acc)
+    plt.plot(acc)
+    plt.show()
     
     
     
