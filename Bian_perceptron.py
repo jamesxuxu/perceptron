@@ -16,12 +16,11 @@ argu = parser.parse_args()
 
 nstep = argu.nstep
 noDev = argu.noDev
-nstep = 10
 #define read data function
 def readData(dataset):
     y = []
     x = []
-    path = ['./adult/a7a' , dataset]
+    path = ['/u/cs246/data/adult/a7a' , dataset]
     filepath = '.'.join(path)
     with open(filepath) as f:
         trainData = csv.reader(f, delimiter=' ')
@@ -83,4 +82,6 @@ for i in range(nstep):
     
 print('Test accuracy:', accuracy)
 print('Feature weights (bias last):', ' '.join(map(str, np.transpose(w)[0])))
-print('dev set accuracy vs. iterations:', accDev)
+
+if noDev == False:
+    print('dev set accuracy vs. iterations:', accDev)
