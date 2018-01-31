@@ -48,14 +48,20 @@ xTest, yTest = readData('test')
 if noDev == False:
     xDev, yDev = readData('dev')
 
+eta = 1.0
+C=0.868
 #function used to train model
 def model(wPre):
     w = wPre
     for index, xn in enumerate(xTrain):
         t = np.sign(np.dot(np.transpose(w), xn))        
-        if t!= yTrain[index]:
-            w = w + yTrain[index]*xn 
+        if t*yTrain[index]>1:
+            w[:-1] -= eta*w[:-1]/(float(len(xTrain)))
+        else:
+            w[:-1] -= eta*(w[:-1]/(float(len(xTrain))) - C*yTrain[index]*xn)
+            w[-1] += eta*C*yTrain[index]
     return w
+
     
 
     
