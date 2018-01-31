@@ -10,7 +10,7 @@ import csv
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--iterations', action='store', dest='nstep', type=int, default=1)
+parser.add_argument('--epochs', action='store', dest='nstep', type=int, default=1)
 parser.add_argument('--nodev', action='store_true', dest='noDev', default=False)
 argu = parser.parse_args()
 
@@ -20,7 +20,7 @@ noDev = argu.noDev
 def readData(dataset):
     y = []
     x = []
-    path = ['/u/cs246/data/adult/a7a' , dataset]
+    path = ['./adult/a7a' , dataset]
     filepath = '.'.join(path)
     with open(filepath) as f:
         trainData = csv.reader(f, delimiter=' ')
@@ -28,7 +28,7 @@ def readData(dataset):
             y.append(int(row[0]))
     
             temp = np.zeros((124,1), dtype=np.int)  
-            temp[-1] = 1
+            temp[0] = 1
             for element in row[1:]:
                 if len(element) != 0:
                     #things are confusing here
@@ -48,23 +48,32 @@ xTest, yTest = readData('test')
 if noDev == False:
     xDev, yDev = readData('dev')
 
-eta = 1.0
-C=0.868
+eta = 0.1
+C = 0.868
+
+
 #function used to train model
 def model(wPre):
     w = wPre
     for index, xn in enumerate(xTrain):
-        t = np.sign(np.dot(np.transpose(w), xn))        
+        t = np.dot(np.transpose(w), xn)       
         if t*yTrain[index]>1:
-            w[:-1] -= eta*w[:-1]/(float(len(xTrain)))
+            w[1:] -= eta*w[1:]/(float(len(xTrain)))
         else:
-            w[:-1] -= eta*(w[:-1]/(float(len(xTrain))) - C*yTrain[index]*xn)
-            w[-1] += eta*C*yTrain[index]
+            w[1:] -= eta*(w[1:]/(float(len(xTrain))) - C*yTrain[index]*xn[1:])
+            w[0]  +=  eta*C*yTrain[index]
     return w
 
-    
+##accuracy function
+def acc(x, y):
+    right = 0
+    for index, xn in enumerate(x):
+        t = np.sign(np.dot(np.transpose(w), xn))
+        if t*y[index] > 0:
+            right += 1
+    accuracy = right/float(len(x))
+    return accuracy
 
-    
 ##test result on test dataset and dev set
 accDev = []
 w = np.zeros((124,1))
@@ -78,16 +87,17 @@ for i in range(nstep):
                 right += 1
         accDev.append(right/float(len(xDev)))
     if i == nstep-1:
-        right = 0
-        for index, xn in enumerate(xTest):
-            t = np.sign(np.dot(np.transpose(w), xn))
-            if t*yTest[index] > 0:
-                right += 1
-        accuracy = right/float(len(xTest))
+        ##test on test
+        accTe = acc(xTest, yTest)
+        ##test on train
+        accTr = acc(xTrain, yTrain)
 
-    
-print('Test accuracy:', accuracy)
-print('Feature weights (bias last):', ' '.join(map(str, np.transpose(w)[0])))
-
+print('EPOCHS:', nstep)  
+print('CAPACITY:', C) 
+print('TEST_ACCURACY:', accTe)
+print('TRAINING_ACCURACY:', accTr)  
+print('DEV_ACCURACY:', accDev[0])
+print('Feature weights (bias first):', ' '.join(map(str, np.transpose(w)[0])))
+print(np.transpose(w)[0])
 if noDev == False:
     print('dev set accuracy vs. iterations:', accDev)
