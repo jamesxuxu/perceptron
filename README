@@ -1,1 +1,48 @@
-CSC446 HW2 by Xin Bian 
+Name: Xin Bian
+Email: xin.bian@rochester.edu
+Course: CSC446
+Homework:
+Implement SGD for SVM for the adult income dataset. Experiment with performance as a function of the capacity parameter C.
+
+************ Files *********
+Bian_Xin_hw3.py: main implementation of SVM
+plot.py: use for conducting experiment of Capacity and plotting results
+plot.png: figure of Capacity experiment
+
+************ Algorithm *****
+SGD for Linear SVM is used.
+
+In the main code, some default parameters are:
+	learning rate: 0.1
+	epochs: 1
+	capacity: 0.868
+
+In the plot code, the parameters are:
+	capacity: 10E-3 to 10E4
+	learning rate: 0.1
+	epochs: 5
+	
+************ Instructions ***
+The code is written by python3.
+
+For main code Bian_Xin_hw3.py:
+sample running command: ./Bian_Xin_hw3.py --epochs 1 --capacity 0.868
+	where you can specify epochs and capacity, otherwise default values are used (epochs=1, capacity=0.868)
+
+For plot code plot.py:
+run by ./plot.py
+The result will be saved in the same folder with the name plot.png
+
+************ Results *******
+The results on test and development datasets are similar.
+
+The accuracy increases when capacity starts increasing from 10E-3, then achieves maximum accuracy (>0.84) at capacity around 0.1. When the capacity is further increased, the accuracy starts to decrease and fluctuates. The performance becomes worse. The accuracy can be as low as ~0.71 when capacity is about 5*10E3.
+
+************ Your interpretation **** (Attention: important!)
+
+Your understanding of the results, for instance, "from the above results, learning rate is very important that a learning rate from XX to XX yields the best result, and that a learning rate larger than XX yields a significant drop of the performance"
+
+************ References ************
+Christopher, M. Bishop. PATTERN RECOGNITION AND MACHINE LEARNING. Springer-Verlag New York, 2016.
+CSC446 notes: https://www.cs.rochester.edu/~gildea/2018_Spring/notes.pdf
+CSC446 assignment description: https://www.cs.rochester.edu/~gildea/2018_Spring/perceptron_assignment_description.txt
